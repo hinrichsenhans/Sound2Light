@@ -48,6 +48,9 @@ static const int SCALED_SPECTRUM_LENGTH = 200;
 // base frequency of the ScaledSpectrum in Hz
 static const int SCALED_SPECTRUM_BASE_FREQ = 20;  // ms
 
+// flag to use right channel
+#define USE_RIGHT true
+
 // A class to prepare the content of an audio buffer for FFT,
 // calculate the FFT and create a ScaledSpectrum of the results.
 // Calls checkForTrigger() of a TriggerGeneratorContainer object when a new FFT is done.
@@ -55,7 +58,7 @@ class FFTAnalyzer
 {
 
 public:
-	explicit FFTAnalyzer(const MonoAudioBuffer& buffer, QVector<TriggerGeneratorInterface*>& m_triggerContainer);
+    explicit FFTAnalyzer(const MonoAudioBuffer& buffer, QVector<TriggerGeneratorInterface*>& m_triggerContainer, bool useRight = false);
 	~FFTAnalyzer();
 
 	// calculates the FFT based on the data in the inputBuffer and updates the ScaledSpectrum
@@ -83,6 +86,7 @@ protected:
 	QVector<float>			m_fftOutput;  // buffer containing the FFT output (intermediate result)
 	QVector<float>			m_linearSpectrum;  // buffer containing the non-scaled spectrum data (intermediate result)
 	ScaledSpectrum			m_scaledSpectrum;  // stores the scaled data of the spectrum
+    bool					m_useRight; //use right (vs left/mono) buffer of monoaudiobuffer
 };
 
 #endif // FFTWRAPPER_H

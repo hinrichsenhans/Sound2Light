@@ -22,7 +22,7 @@
 
 #include "FFTRealWrapper.h"
 
-FFTAnalyzer::FFTAnalyzer(const MonoAudioBuffer& buffer,QVector<TriggerGeneratorInterface*>& triggerContainer)
+FFTAnalyzer::FFTAnalyzer(const MonoAudioBuffer& buffer, QVector<TriggerGeneratorInterface*>& triggerContainer, bool useRight)
 	: m_inputBuffer(buffer)
 	, m_triggerContainer(triggerContainer)
 	, m_fft(0)
@@ -30,7 +30,8 @@ FFTAnalyzer::FFTAnalyzer(const MonoAudioBuffer& buffer,QVector<TriggerGeneratorI
 	, m_window(NUM_SAMPLES)
 	, m_fftOutput(NUM_SAMPLES)
 	, m_linearSpectrum(NUM_SAMPLES / 2)
-	, m_scaledSpectrum(SCALED_SPECTRUM_BASE_FREQ, SCALED_SPECTRUM_LENGTH)
+    , m_scaledSpectrum(SCALED_SPECTRUM_BASE_FREQ, SCALED_SPECTRUM_LENGTH)
+    , m_useRight(useRight)
 {
 	m_fft = (BasicFFTInterface*) new FFTRealWrapper<NUM_SAMPLES_EXPONENT>();
 	calculateWindow();
@@ -45,7 +46,7 @@ void FFTAnalyzer::calculateWindow()
 {
 	// Hann Window function
 	// used to prepare the PCM data for FFT
-	for (int i=0; i<NUM_SAMPLES; ++i) {
+    for (int i=0; i<NUM_SAMPLES; ++i) {
 		m_window[i] = 0.5f * (1 - qCos((2 * M_PI * i) / (NUM_SAMPLES - 1)));
 	}
 }
@@ -54,7 +55,7 @@ void FFTAnalyzer::calculateFFT(bool lowSoloMode)
 {
 	// apply window:
 	for (int i=0; i < NUM_SAMPLES; ++i) {
-		m_buffer[i] = m_inputBuffer.at(i) * m_window[i];
+        m_buffer[i] = (m_useRight ? m_inputBuffer.at_right(i) : m_inputBuffer.at(i)) * m_window[i];
 	}
 
 	// apply FFT:

@@ -46,6 +46,7 @@ public:
 
 	// returns the value in the buffer at index i
 	const qreal& at(int i) const { return m_buffer[i]; }
+    const qreal& at_right(int i) const { return m_buffer[i]; }
 
     // returns the number of samples that have ever been put in the buffer
     int64_t getNumPutSamples() const { return m_numPutSamples; }

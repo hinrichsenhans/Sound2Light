@@ -165,7 +165,7 @@ public slots:
 	void restoreWindowGeometry();
 
     // update function passed to the FFTAnalyzer
-    void updateFFT() { m_fft.calculateFFT(m_lowSoloMode); }
+    void updateFFT() { m_fft.calculateFFT(m_lowSoloMode); m_fft_right.calculateFFT(m_lowSoloMode); }
 
     // update function passed to the BPMDetector
     void updateBPM() { m_bpm.detectBPM(); }
@@ -374,11 +374,13 @@ public:  // to allow access from OSCMapping class without getters
 
 protected:
 	QQmlApplicationEngine*		m_qmlEngine;  // pointer to QmlEngine (created in main.cpp)
-	QVector<TriggerGeneratorInterface*> m_triggerContainer;  // list of all TriggerGenerators
-	MonoAudioBuffer				m_buffer;  // MonoAudioBuffer instance
+    QVector<TriggerGeneratorInterface*> m_triggerContainer;  // list of all TriggerGenerators
+    QVector<TriggerGeneratorInterface*> m_triggerContainer_right;  // list of all TriggerGenerators
+    MonoAudioBuffer				m_buffer;  // MonoAudioBuffer instance
 	AudioInputInterface*		m_audioInput;  // pointer to AudioInputInterface implementation
 	FFTAnalyzer					m_fft;  // FFTAnalyzer instance
-	OSCNetworkManager			m_osc;  // OSCNetworkManager instance
+    FFTAnalyzer					m_fft_right;  // FFTAnalyzer instance for right channel
+    OSCNetworkManager			m_osc;  // OSCNetworkManager instance
 	QString						m_consoleType;  // console type as string ("EOS" or "Cobalt")
 	QTimer						m_fftUpdateTimer;  // Timer used to trigger FFT update
 	QString						m_currentPresetFilename;  // file path and name of active preset
@@ -400,6 +402,14 @@ protected:
 	TriggerGenerator* m_high;  // pointer to High TriggerGenerator instance
 	TriggerGenerator* m_envelope;  // pointer to Level TriggerGenerator instance
 	TriggerGenerator* m_silence;  // pointer to Silence TriggerGenerator instance
+
+
+    TriggerGenerator* m_bass_right;  // pointer to Bass TriggerGenerator instance
+    TriggerGenerator* m_loMid_right;  // pointer to LoMid TriggerGenerator instance
+    TriggerGenerator* m_hiMid_right;  // pointer to HiMid TriggerGenerator instance
+    TriggerGenerator* m_high_right;  // pointer to High TriggerGenerator instance
+    TriggerGenerator* m_envelope_right;  // pointer to Level TriggerGenerator instance
+    TriggerGenerator* m_silence_right;  // pointer to Silence TriggerGenerator instance
 
 };
 

@@ -43,7 +43,7 @@ class TriggerGuiController : public QObject
 	Q_PROPERTY(QString oscLabelText READ getLabelText NOTIFY oscLabelTextChanged)
 
 public:
-	explicit TriggerGuiController(TriggerGenerator* m_trigger, QObject *parent = 0);
+    explicit TriggerGuiController(TriggerGenerator* m_trigger, TriggerGenerator* m_trigger_right, QObject *parent = 0);
 
 signals:
 	// emitted when the filtered trigger is activated
@@ -67,17 +67,17 @@ public slots:
 	// see TriggerGenerator.h for documentation
 
     bool getMute() const { return m_trigger->getMute(); }
-    void toggleMute() { m_trigger->toggleMute(); emit muteChanged(); }
-    void setMute(bool mute) { m_trigger->setMute(mute); emit muteChanged(); }
+    void toggleMute() { m_trigger->toggleMute(); m_trigger_right->toggleMute(); emit muteChanged(); }
+    void setMute(bool mute) { m_trigger->setMute(mute); m_trigger_right->setMute(mute); emit muteChanged(); }
 
 	int getMidFreq() const { return m_trigger->getMidFreq(); }
-	void setMidFreq(const int& value) { m_trigger->setMidFreq(value); emit parameterChanged(); emit presetChanged(); }
+    void setMidFreq(const int& value) { m_trigger->setMidFreq(value); m_trigger_right->setMidFreq(value); emit parameterChanged(); emit presetChanged(); }
 
 	qreal getWidth() const { return m_trigger->getWidth(); }
-	void setWidth(const qreal& value) { m_trigger->setWidth(value); emit parameterChanged(); emit presetChanged(); }
+    void setWidth(const qreal& value) { m_trigger->setWidth(value); m_trigger_right->setWidth(value); emit parameterChanged(); emit presetChanged(); }
 
 	qreal getThreshold() const { return m_trigger->getThreshold(); }
-	void setThreshold(const qreal& value) { m_trigger->setThreshold(value); emit parameterChanged(); emit presetChanged(); }
+    void setThreshold(const qreal& value) { m_trigger->setThreshold(value); m_trigger_right->setThreshold(value); emit parameterChanged(); emit presetChanged(); }
 
 	qreal getCurrentLevel() const { return m_trigger->getCurrentLevel(); }
 
@@ -86,34 +86,34 @@ public slots:
 	// see TriggerFilter.h for documentation
 
 	qreal getOnDelay() const { return m_trigger->getTriggerFilter().getOnDelay(); }
-	void setOnDelay(const qreal& value) { m_trigger->getTriggerFilter().setOnDelay(value); emit parameterChanged(); emit presetChanged(); }
+    void setOnDelay(const qreal& value) { m_trigger->getTriggerFilter().setOnDelay(value);  m_trigger_right->getTriggerFilter().setOnDelay(value); emit parameterChanged(); emit presetChanged(); }
 
 	qreal getOffDelay() const { return m_trigger->getTriggerFilter().getOffDelay(); }
-	void setOffDelay(const qreal& value) { m_trigger->getTriggerFilter().setOffDelay(value); emit parameterChanged(); emit presetChanged(); }
+    void setOffDelay(const qreal& value) { m_trigger->getTriggerFilter().setOffDelay(value); m_trigger_right->getTriggerFilter().setOffDelay(value); emit parameterChanged(); emit presetChanged(); }
 
 	qreal getMaxHold() const { return m_trigger->getTriggerFilter().getMaxHold(); }
-	void setMaxHold(const qreal& value) { m_trigger->getTriggerFilter().setMaxHold(value); emit parameterChanged(); emit presetChanged(); }
+    void setMaxHold(const qreal& value) { m_trigger->getTriggerFilter().setMaxHold(value); m_trigger_right->getTriggerFilter().setMaxHold(value); emit parameterChanged(); emit presetChanged(); }
 
 	// forward calls to TriggerOscParameters
 	// see TriggerOscSettings.h for documentation
 
 	QString getOnMessage() const { return m_trigger->getOscParameters().getOnMessage(); }
-	void setOnMessage(const QString& value) { m_trigger->getOscParameters().setOnMessage(value); emit presetChanged(); }
+    void setOnMessage(const QString& value) { m_trigger->getOscParameters().setOnMessage(value); m_trigger_right->getOscParameters().setOnMessage(value); emit presetChanged(); }
 
 	QString getOffMessage() const { return m_trigger->getOscParameters().getOffMessage(); }
-	void setOffMessage(const QString& value) { m_trigger->getOscParameters().setOffMessage(value); emit presetChanged(); }
+    void setOffMessage(const QString& value) { m_trigger->getOscParameters().setOffMessage(value); m_trigger_right->getOscParameters().setOffMessage(value); emit presetChanged(); }
 
 	QString getLevelMessage() const { return m_trigger->getOscParameters().getLevelMessage(); }
-	void setLevelMessage(const QString& value) {m_trigger->getOscParameters().setLevelMessage(value); emit presetChanged(); }
+    void setLevelMessage(const QString& value) { m_trigger->getOscParameters().setLevelMessage(value); m_trigger_right->getOscParameters().setLevelMessage(value); emit presetChanged(); }
 
 	qreal getMinLevelValue() const { return m_trigger->getOscParameters().getMinLevelValue(); }
-	void setMinLevelValue(const qreal& value) { m_trigger->getOscParameters().setMinLevelValue(value); emit presetChanged(); }
+    void setMinLevelValue(const qreal& value) { m_trigger->getOscParameters().setMinLevelValue(value);  m_trigger_right->getOscParameters().setMinLevelValue(value); emit presetChanged(); }
 
 	qreal getMaxLevelValue() const { return m_trigger->getOscParameters().getMaxLevelValue(); }
-	void setMaxLevelValue(const qreal& value) { m_trigger->getOscParameters().setMaxLevelValue(value); emit presetChanged(); }
+    void setMaxLevelValue(const qreal& value) { m_trigger->getOscParameters().setMaxLevelValue(value); m_trigger_right->getOscParameters().setMaxLevelValue(value); emit presetChanged(); }
 
 	QString getLabelText() const { return m_trigger->getOscParameters().getLabelText(); }
-	void setLabelText(const QString& value) { m_trigger->getOscParameters().setLabelText(value); emit oscLabelTextChanged(); emit presetChanged(); }
+    void setLabelText(const QString& value) { m_trigger->getOscParameters().setLabelText(value); m_trigger_right->getOscParameters().setLabelText(value); emit oscLabelTextChanged(); emit presetChanged(); }
 
 	// --- shortcut to set all OSC parameters:
 	void setOscMessages(QString on, QString off, QString level, qreal minLevel, qreal maxLevel, QString labelText)
@@ -124,7 +124,15 @@ public slots:
 		m_trigger->getOscParameters().setMinLevelValue(minLevel);
 		m_trigger->getOscParameters().setMaxLevelValue(maxLevel);
 		m_trigger->getOscParameters().setLabelText(labelText);
-		emit oscLabelTextChanged();
+
+        m_trigger_right->getOscParameters().setOnMessage(on);
+        m_trigger_right->getOscParameters().setOffMessage(off);
+        m_trigger_right->getOscParameters().setLevelMessage(level);
+        m_trigger_right->getOscParameters().setMinLevelValue(minLevel);
+        m_trigger_right->getOscParameters().setMaxLevelValue(maxLevel);
+        m_trigger_right->getOscParameters().setLabelText(labelText);
+
+        emit oscLabelTextChanged();
 		emit presetChanged();
 	}
 
@@ -143,7 +151,8 @@ public slots:
 	bool getActive() const { return m_trigger->getTriggerFilter().getOutputIsActive(); }
 
 protected:
-	TriggerGenerator* m_trigger;  // pointer to TriggerGenerator object that this Controller refers to
+    TriggerGenerator* m_trigger;  // pointer to TriggerGenerator object that this Controller refers to
+    TriggerGenerator* m_trigger_right;
 };
 
 #endif // BANDPASSTRIGGERGUICONTROLLER_H

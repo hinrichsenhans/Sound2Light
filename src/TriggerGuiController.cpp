@@ -23,7 +23,7 @@
 #include "FFTAnalyzer.h"
 #include "ScaledSpectrum.h"
 
-TriggerGuiController::TriggerGuiController(TriggerGenerator *trigger, QObject *parent)
+TriggerGuiController::TriggerGuiController(TriggerGenerator *trigger, TriggerGenerator *m_trigger_right, QObject *parent)
     : QObject(parent)
     , m_trigger(trigger)
 {

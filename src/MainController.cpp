@@ -41,7 +41,8 @@ MainController::MainController(QQmlApplicationEngine* qmlEngine, QObject *parent
 	, m_qmlEngine(qmlEngine)
     , m_buffer(NUM_SAMPLES*4) // more buffer so the bpm detector can get overlaping data
 	, m_audioInput(0)
-	, m_fft(m_buffer, m_triggerContainer)
+    , m_fft(m_buffer, m_triggerContainer)
+    , m_fft_right(m_buffer, m_triggerContainer_right, USE_RIGHT)
 	, m_osc()
 	, m_consoleType("EOS")
 	, m_oscMapping(this)
@@ -129,18 +130,36 @@ void MainController::initializeGenerators()
 	m_triggerContainer.append(m_high);
 	m_triggerContainer.append(m_envelope);
 	m_triggerContainer.append(m_silence);
+
+    // create TriggerGenerator objects:
+    m_bass_right = new TriggerGenerator("bass", &m_osc, true, false, 80);
+    m_loMid_right = new TriggerGenerator("loMid", &m_osc, true, false, 400);
+    m_hiMid_right = new TriggerGenerator("hiMid", &m_osc, true, false, 1000);
+    m_high_right = new TriggerGenerator("high", &m_osc, true, false, 5000);
+    m_envelope_right = new TriggerGenerator("envelope", &m_osc, false);
+    m_silence_right = new TriggerGenerator("silence", &m_osc, false, true);
+
+    // append triggerGenerators to triggerContainer:
+    // (container is used to access all generators at once)
+    // order is important because of lowSoloMode
+    m_triggerContainer_right.append(m_bass_right);
+    m_triggerContainer_right.append(m_loMid_right);
+    m_triggerContainer_right.append(m_hiMid_right);
+    m_triggerContainer_right.append(m_high_right);
+    m_triggerContainer_right.append(m_envelope_right);
+    m_triggerContainer_right.append(m_silence_right);
 }
 
 void MainController::connectGeneratorsWithGui()
 {
 	// create TriggerGuiController objects
 	// and initialize them with the correct triggerGenerators:
-	m_bassController = new TriggerGuiController(m_bass);
-	m_loMidController = new TriggerGuiController(m_loMid);
-	m_hiMidController = new TriggerGuiController(m_hiMid);
-	m_highController = new TriggerGuiController(m_high);
-	m_envelopeController = new TriggerGuiController(m_envelope);
-	m_silenceController = new TriggerGuiController(m_silence);
+    m_bassController = new TriggerGuiController(m_bass, m_bass_right);
+    m_loMidController = new TriggerGuiController(m_loMid, m_loMid_right);
+    m_hiMidController = new TriggerGuiController(m_hiMid, m_hiMid_right);
+    m_highController = new TriggerGuiController(m_high, m_high_right);
+    m_envelopeController = new TriggerGuiController(m_envelope, m_envelope_right);
+    m_silenceController = new TriggerGuiController(m_silence, m_silence_right);
 
 	// set a QML context property for each
 	// so that for example the m_bassController is accessible as "bassController" in QML:
