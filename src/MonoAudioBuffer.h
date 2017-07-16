@@ -31,6 +31,13 @@ class MonoAudioBuffer
 {
 
 public:
+    enum InputType {
+        MONO,
+        STEREO,
+        LEFT_ONLY,
+        RIGHT_ONLY
+    };
+
 	explicit MonoAudioBuffer(int capacity);
 
 	// puts samples in the buffer
@@ -44,14 +51,21 @@ public:
     int64_t getNumPutSamples() const { return m_numPutSamples; }
     int getCapacity() const { return m_capacity; }
 
+    QString getAudioInputType() const;
+    void setAudioInputType(QString type);
+
 protected:
 	// Converts PCM data with multiple channels to mono by averaging all channels.
 	// Result is saved inplace and data object will be resized.
 	void convertToMonoInplace(QVector<qreal>& data, const int& channelCount) const;
+    // Selects single channel from PCM data and discards other channels.
+    // Result is saved inplace and data object will be resized.
+    void chooseSingleChannel(QVector<qreal> &data, const int &channelCount, const int chanIdx) const;
 
     const int    m_capacity;  // max capacity of the buffer, should be length of FFT
 	Qt3DCore::QCircularBuffer<qreal>	m_buffer;  // a circular buffer, removing the oldest elements when inserting new ones
     int64_t      m_numPutSamples; // the number of samples that have ever been put into the buffer
+    InputType 	m_inputType;
 };
 
 #endif // MONOAUDIOBUFFER_H

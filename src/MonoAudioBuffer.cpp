@@ -29,19 +29,62 @@ MonoAudioBuffer::MonoAudioBuffer(int capacity)
 {
 	for (int i=0; i < m_buffer.capacity(); ++i) {
 		m_buffer.push_back(0.0);
-	}
+    }
+    setAudioInputType("Mono");
 }
 
 void MonoAudioBuffer::putSamples(QVector<qreal>& data, const int& channelCount)
 {
 	// convert incoming mulitchannel audio to mono:
-	convertToMonoInplace(data, channelCount);
+
+    switch(m_inputType)
+    {
+    case MONO:
+        convertToMonoInplace(data, channelCount);
+        break;
+    case STEREO:
+        break;
+    case LEFT_ONLY:
+        chooseSingleChannel(data, channelCount, 1);
+        break;
+    case RIGHT_ONLY:
+        chooseSingleChannel(data, channelCount, 2);
+        break;
+    }
 
 	for (int i=0; i<data.size(); ++i) {
 		m_buffer.push_back(data[i]);
     }
 
     m_numPutSamples += data.size();
+}
+
+QString MonoAudioBuffer::getAudioInputType() const
+{
+   switch(m_inputType)
+   {
+   default:
+   case MONO:
+       return "Mono";
+   case STEREO:
+       return "Stereo";
+   case LEFT_ONLY:
+       return "Left";
+   case RIGHT_ONLY:
+       return "Right";
+   }
+}
+
+void MonoAudioBuffer::setAudioInputType(QString type)
+{
+    if(type.toLower() == "stereo")
+        m_inputType = STEREO;
+    else if(type.toLower() == "left")
+        m_inputType = LEFT_ONLY;
+    else if(type.toLower() == "right")
+        m_inputType = RIGHT_ONLY;
+    else
+        m_inputType = MONO;
 }
 
 void MonoAudioBuffer::convertToMonoInplace(QVector<qreal>& data, const int& channelCount) const {
@@ -72,5 +115,35 @@ void MonoAudioBuffer::convertToMonoInplace(QVector<qreal>& data, const int& chan
 		data.resize(data.size() / channelCount);
 		break;
 	}
+
+}
+
+void MonoAudioBuffer::chooseSingleChannel(QVector<qreal>& data, const int& channelCount, const int chanIdx) const {
+    // - assumes that data for two channels A and B looks like ABABABABAB...
+    // - channels are average to get mono signal
+    // - result will be written inplace and data object will be decreased in size
+    switch (channelCount) {
+    case 1:
+        break;
+    case 2:
+        for (int i=0; i<data.size(); i+=2) {
+            //select correct audio channel, discard rest
+            if(chanIdx == 2)
+                data[i/2] = data[i+1];
+            else
+                data[i/2] = data[i];
+        }
+        data.resize(data.size() / 2);
+        break;
+    default:
+        for (int i=0; i<data.size(); i+=channelCount) {
+            qreal mono = 0.0;
+            int offset = chanIdx - 1;
+            //select correct audio channel, discard rest
+            data[i/channelCount] = data[i + offset];
+        }
+        data.resize(data.size() / channelCount);
+        break;
+    }
 
 }

@@ -276,6 +276,10 @@ public slots:
 	qreal getVolume() const { return m_audioInput->getVolume(); }
 	void setVolume(const qreal& value) { m_audioInput->setVolume(value); emit presetChanged(); }
 
+    //forward calls to MonoAudioBuffer
+    QString getAudioInputType() const { return m_buffer.getAudioInputType(); }
+    void setAudioInputType(QString type) { m_buffer.setAudioInputType(type); }
+
 	// forward calls to ScaledSpectrum of FFTAnalyzer
 	// see ScaledSpectrum.h for documentation
 	qreal getFftGain() const { return m_fft.getScaledSpectrum().getGain(); }

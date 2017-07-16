@@ -214,8 +214,8 @@ Dialog {
 				}
 			}
 
-			// ----------------------- Input Device List ----------------------
-			GreyText {
+            // ----------------------- Input Device List ----------------------
+            GreyText {
 				width: parent.width
 				height: 40
 				text: "Input:"
@@ -223,7 +223,31 @@ Dialog {
 				horizontalAlignment: Text.AlignLeft
 				verticalAlignment: Text.AlignVCenter
 			}
-			ExclusiveGroup { id: inputListGroup }
+            Row {
+                width: parent.width
+                height: 30
+
+                CenterLabel {
+                    width: parent.width  * 0.5
+                    height: parent.height
+                    text: "Mix:"
+                }
+
+                DarkComboBox {
+                    property var audioTypes: ["Mono", "Stereo", "Left", "Right" ]
+                    width: parent.width  * 0.5
+                    height: parent.height
+                    model: audioTypes
+                    currentIndex: audioTypes.indexOf(controller.getAudioInputType())
+                    onCurrentTextChanged: {
+                        if (currentText && currentText !== controller.getAudioInputType()) {
+                            controller.setAudioInputType(currentText)
+                        }
+                    }
+                }
+            }
+
+            ExclusiveGroup { id: inputListGroup }
 			ScrollView {
 				width: parent.width
 				height: parent.height - 40*2 - 30*5 - 20 - (udpTxPort.visible ? 30 : 0)
@@ -252,7 +276,9 @@ Dialog {
 						}
 					}
 				}
-			}
+
+            }
+
 
 			// ----------------------- OK and About Button ----------------------
 
