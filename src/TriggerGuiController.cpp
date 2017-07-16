@@ -23,20 +23,27 @@
 #include "FFTAnalyzer.h"
 #include "ScaledSpectrum.h"
 
-TriggerGuiController::TriggerGuiController(TriggerGenerator *trigger, TriggerGenerator *m_trigger_right, QObject *parent)
+TriggerGuiController::TriggerGuiController(TriggerGenerator *trigger, TriggerGenerator *trigger_right, QObject *parent)
     : QObject(parent)
     , m_trigger(trigger)
+    , m_trigger_right(trigger_right)
 {
-    // connect on and off signals of TriggerFilter with the signals of this controller:
+     // connect on and off signals of TriggerFilter with the signals of this controller:y
     connect(&(trigger->getTriggerFilter()), SIGNAL(onSignalSent()), this, SIGNAL(triggerOn()));
-	connect(&(trigger->getTriggerFilter()), SIGNAL(offSignalSent()), this, SIGNAL(triggerOff()));
-	connect(&(trigger->getTriggerFilter()), SIGNAL(onSignalSent()), this, SIGNAL(activeChanged()));
-	connect(&(trigger->getTriggerFilter()), SIGNAL(offSignalSent()), this, SIGNAL(activeChanged()));
+    connect(&(trigger->getTriggerFilter()), SIGNAL(offSignalSent()), this, SIGNAL(triggerOff()));
+    connect(&(trigger->getTriggerFilter()), SIGNAL(onSignalSent()), this, SIGNAL(activeChanged()));
+    connect(&(trigger->getTriggerFilter()), SIGNAL(offSignalSent()), this, SIGNAL(activeChanged()));
+    // connect on and off signals of TriggerFilter with the signals of this controller:y
+    connect(&(trigger_right->getTriggerFilter()), SIGNAL(onSignalSent()), this, SIGNAL(triggerOn()));
+    connect(&(trigger_right->getTriggerFilter()), SIGNAL(offSignalSent()), this, SIGNAL(triggerOff()));
+    connect(&(trigger_right->getTriggerFilter()), SIGNAL(onSignalSent()), this, SIGNAL(activeChanged()));
+    connect(&(trigger_right->getTriggerFilter()), SIGNAL(offSignalSent()), this, SIGNAL(activeChanged()));
 }
 
 void TriggerGuiController::resetParameters()
 {
 	m_trigger->resetParameters();
+    m_trigger_right->resetParameters();
 	emit parameterChanged();
 	emit oscLabelTextChanged();
 }

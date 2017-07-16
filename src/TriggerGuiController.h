@@ -43,7 +43,7 @@ class TriggerGuiController : public QObject
 	Q_PROPERTY(QString oscLabelText READ getLabelText NOTIFY oscLabelTextChanged)
 
 public:
-    explicit TriggerGuiController(TriggerGenerator* m_trigger, TriggerGenerator* m_trigger_right, QObject *parent = 0);
+    explicit TriggerGuiController(TriggerGenerator* m_trigger, TriggerGenerator* trigger_right, QObject *parent = 0);
 
 signals:
 	// emitted when the filtered trigger is activated
