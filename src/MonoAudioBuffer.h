@@ -46,7 +46,7 @@ public:
 
 	// returns the value in the buffer at index i
 	const qreal& at(int i) const { return m_buffer[i]; }
-    const qreal& at_right(int i) const { return m_buffer[i]; }
+    const qreal& at_right(int i) const { return m_buffer_right[i]; }
 
     // returns the number of samples that have ever been put in the buffer
     int64_t getNumPutSamples() const { return m_numPutSamples; }
@@ -62,9 +62,14 @@ protected:
     // Selects single channel from PCM data and discards other channels.
     // Result is saved inplace and data object will be resized.
     void chooseSingleChannel(QVector<qreal> &data, const int &channelCount, const int chanIdx) const;
+    //Splits buffer into two channels - left and right, if available
+    //If single channel, right buffer empty
+    //If multi-channel, first two streams are used, and rest are discarded
+    void splitBuffer(QVector<qreal> &data, const int &channelCount);
 
     const int    m_capacity;  // max capacity of the buffer, should be length of FFT
 	Qt3DCore::QCircularBuffer<qreal>	m_buffer;  // a circular buffer, removing the oldest elements when inserting new ones
+    Qt3DCore::QCircularBuffer<qreal>	m_buffer_right;  // a circular buffer, removing the oldest elements when inserting new ones
     int64_t      m_numPutSamples; // the number of samples that have ever been put into the buffer
     InputType 	m_inputType;
 };

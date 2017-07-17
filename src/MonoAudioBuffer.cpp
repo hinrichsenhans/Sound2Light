@@ -24,11 +24,13 @@
 
 MonoAudioBuffer::MonoAudioBuffer(int capacity)
 	: m_capacity(capacity)
-	, m_buffer(capacity)
+    , m_buffer(capacity)
+    , m_buffer_right(capacity)
     , m_numPutSamples(0)
 {
 	for (int i=0; i < m_buffer.capacity(); ++i) {
 		m_buffer.push_back(0.0);
+        m_buffer_right.push_back(0.0);
     }
     setAudioInputType("Mono");
 }
@@ -52,8 +54,13 @@ void MonoAudioBuffer::putSamples(QVector<qreal>& data, const int& channelCount)
         break;
     }
 
-	for (int i=0; i<data.size(); ++i) {
-		m_buffer.push_back(data[i]);
+    if( m_inputType != STEREO) {
+        for (int i=0; i<data.size(); ++i) {
+            m_buffer.push_back(data[i]);
+        }
+    }
+    else {
+        splitBuffer(data, channelCount);
     }
 
     m_numPutSamples += data.size();
@@ -146,4 +153,20 @@ void MonoAudioBuffer::chooseSingleChannel(QVector<qreal>& data, const int& chann
         break;
     }
 
+}
+
+void MonoAudioBuffer::splitBuffer(QVector<qreal>& data, const int& channelCount)
+{
+    switch(channelCount) {
+    case 1:
+         for(int i=0; i<data.size(); ++i)
+             m_buffer.push_back(data[i]);
+        break;
+    case 2:
+    default:
+        for(int i=0; i<data.size(); i+=channelCount) {
+            m_buffer.push_back(data[i]);
+            m_buffer_right.push_back(data[i+1]);
+        }
+    }
 }
