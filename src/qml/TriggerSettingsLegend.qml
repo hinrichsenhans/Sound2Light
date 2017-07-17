@@ -95,7 +95,7 @@ Column {
 		id: details
 		visible: detailsVisible
 		width: parent.width
-        height: detailsVisible ? 30*6 : 0  // 6 labels with 30px height each
+        height: detailsVisible ? 30*7 : 0  // 7 labels with 30px height each
 		CenterLabel {
 			text: "Frequency"
 		}
@@ -111,8 +111,11 @@ Column {
 		CenterLabel {
 			text: "Decay"
 		}
-		CenterLabel {
-			text: "OSC Message"
+        CenterLabel {
+            text: "OSC Message"
+        }
+        CenterLabel {
+            text: "OSC Message (R)"
         }
 	}
     CenterLabel {

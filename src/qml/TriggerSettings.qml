@@ -101,7 +101,7 @@ Item {
 			id: details
 			visible: detailsVisible
 			width: parent.width
-            height: detailsVisible ? 30*6 : 0
+            height: detailsVisible ? 30*7 : 0
 
 			Column {  // ------------------ Frequency and Width - only visible if this is a Bandpass ---------
 				width: parent.width
@@ -173,9 +173,15 @@ Item {
 			// ---------------------------- OSC Settings ----------------------
 			DarkButton {
 				width: parent.width
-				height: 30
-				text: (triggerController.oscLabelText !== "") ? triggerController.oscLabelText : "---"
+                height: 30
+                text: (triggerController.oscLabelText !== "") ? triggerController.oscLabelText : "---"
 				onClicked: controller.openDialog("qrc:/qml/OscMessageDialog.qml", "triggerController", root.triggerController)
+            }
+            DarkButton {
+                width: parent.width
+                height: 30
+                text: (triggerController.oscLabelText !== "") ? triggerController.oscLabelText : "---"
+                onClicked: controller.openDialog("qrc:/qml/OscMessageDialog.qml", "triggerController", root.triggerController)
             }
 		}  // details Column
 
