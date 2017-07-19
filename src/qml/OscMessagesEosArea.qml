@@ -36,7 +36,7 @@ import "style"  // import all files in style dir
 // ----------- Content of the OSC dialog for EOS console type -----------
 Item {
 	anchors.fill: parent
-
+    id: eosDialog
 	// ------------ ComboBox and Loader for settings components -------
 	Column {
 		anchors.fill: parent
@@ -94,8 +94,8 @@ Item {
 				function updateSettingsArea() {
 					// This method loads the correct Settings Component
 					// for the chosen message type category in this ComboBox.
-					if (currentText === "Channel") {
-						settingsArea.sourceComponent = eosChannelSettings
+                    if (currentText === "Channel") {
+                        settingsArea.sourceComponent = eosChannelSettings
 					} else if (currentText === "Group") {
 						settingsArea.sourceComponent = eosGroupSettings
 					} else if (currentText === "Macro") {
@@ -113,6 +113,7 @@ Item {
 					} else if (currentText === "--- Inactive") {
 						settingsArea.sourceComponent = eosInactiveSettings
 					}
+                    settingsArea.useRight = useRight
 				}
 			}  // ComboBox end
 
@@ -126,8 +127,9 @@ Item {
 		}
 		Loader {
             // This loader holds the Settings Component for the chosen message type category.
-            property alias useRight: settingsArea.useRight
-			id: settingsArea
+            //property alias useRight: mainArea.useRight
+            id: settingsArea
+            property bool useRight
 			width: parent.width
 			height: parent.height - 30
 		}
@@ -153,7 +155,7 @@ Item {
 	// - getMessages() returns an object with information about the setted up messages.
 
 	// ------------------------------ Channel
-	Component {
+    Component {
 		id: eosChannelSettings
 		Column {
 			anchors.fill: parent
@@ -278,7 +280,7 @@ Item {
 	}
 	// ------------------------------ Group
 	Component {
-		id: eosGroupSettings
+        id: eosGroupSettings
 		Column {
 			anchors.fill: parent
 			spacing: 5
@@ -403,7 +405,7 @@ Item {
 	}
 	// ------------------------------ Macro
 	Component {
-		id: eosMacroSettings
+        id: eosMacroSettings
 		Column {
 			anchors.fill: parent
 			spacing: 5
@@ -502,7 +504,7 @@ Item {
 	}
 	// ------------------------------ Submaster
 	Component {
-		id: eosSubmasterSettings
+        id: eosSubmasterSettings
 		Column {
 			anchors.fill: parent
 			spacing: 5
@@ -627,7 +629,7 @@ Item {
 	}
 	// ------------------------------ Bump Sub
 	Component {
-		id: eosBumpSubSettings
+        id: eosBumpSubSettings
 		Column {
 			anchors.fill: parent
 			spacing: 5
@@ -672,7 +674,7 @@ Item {
 	}
 	// ------------------------------ Cue
 	Component {
-		id: eosCueSettings
+        id: eosCueSettings
 		Column {
 			anchors.fill: parent
 			spacing: 5
@@ -826,7 +828,7 @@ Item {
 		}
 	}// ------------------------------ Fader
 	Component {
-		id: eosFaderSettings
+        id: eosFaderSettings
 		Column {
 			anchors.fill: parent
 			spacing: 5
@@ -969,7 +971,7 @@ Item {
 	}
 	// ------------------------------ Custom
 	Component {
-		id: eosCustomSettings
+        id: eosCustomSettings
 		Column {
 			anchors.fill: parent
 			spacing: 5
@@ -1078,7 +1080,7 @@ Item {
 	}
 	// ------------------------------ Inactive
 	Component {
-		id: eosInactiveSettings
+        id: eosInactiveSettings
 		Column {
 			anchors.fill: parent
 			anchors.margins: 10

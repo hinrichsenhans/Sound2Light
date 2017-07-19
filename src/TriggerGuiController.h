@@ -123,7 +123,8 @@ public slots:
 
 	QString getLabelText() const { return m_trigger->getOscParameters().getLabelText(); }
     QString getLabelTextRight() const { return m_trigger_right->getOscParameters().getLabelText(); }
-    void setLabelText(const QString& value) { m_trigger->getOscParameters().setLabelText(value); m_trigger_right->getOscParameters().setLabelText(value); emit oscLabelTextChanged(); emit presetChanged(); }
+    void setLabelText(const QString& value) { m_trigger->getOscParameters().setLabelText(value); emit oscLabelTextChanged(); emit presetChanged(); }
+    void setLabelTextRight(const QString& value) { m_trigger_right->getOscParameters().setLabelText(value); emit oscLabelTextChangedRight(); emit presetChanged(); }
 
 	// --- shortcut to set all OSC parameters:
 	void setOscMessages(QString on, QString off, QString level, qreal minLevel, qreal maxLevel, QString labelText)
@@ -148,7 +149,7 @@ public slots:
         m_trigger_right->getOscParameters().setMaxLevelValue(maxLevel);
         m_trigger_right->getOscParameters().setLabelText(labelText);
 
-        emit oscLabelTextChanged();
+        emit oscLabelTextChangedRight();
         emit presetChanged();
     }
 	// resets all parameters to default values
