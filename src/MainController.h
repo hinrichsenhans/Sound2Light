@@ -325,7 +325,8 @@ public slots:
 	void sendOscTestMessage(QString message);
 
 	// opens a dialog from a QML file
-	void openDialog(const QString& qmlDialogFile, QString propertyName = "", QVariant propertyValue = QVariant());
+    //void openDialog(const QString& qmlDialogFile, QString propertyName = "", QVariant propertyValue = QVariant());
+    void openDialog(const QString& qmlDialogFile, QStringList propertyName = QStringList(), QVariantList propertyValue = QVariantList());
 
 	// removes dialog from openend dialogs list
 	void dialogIsClosed(QObject* object);

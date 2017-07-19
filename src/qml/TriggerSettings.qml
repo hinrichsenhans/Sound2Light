@@ -175,13 +175,13 @@ Item {
 				width: parent.width
                 height: 30
                 text: (triggerController.oscLabelText !== "") ? triggerController.oscLabelText : "---"
-				onClicked: controller.openDialog("qrc:/qml/OscMessageDialog.qml", "triggerController", root.triggerController)
+                onClicked: controller.openDialog("qrc:/qml/OscMessageDialog.qml", ["triggerController"], [root.triggerController])
             }
             DarkButton {
                 width: parent.width
                 height: 30
-                text: (triggerController.oscLabelText !== "") ? triggerController.oscLabelText : "---"
-                onClicked: controller.openDialog("qrc:/qml/OscMessageDialog.qml", "triggerController", root.triggerController)
+                text: (triggerController.oscLabelTextRight !== "") ? triggerController.oscLabelTextRight : "---"
+                onClicked: controller.openDialog("qrc:/qml/OscMessageDialog.qml", ["triggerController", "useRight"], [root.triggerController, 1])
             }
 		}  // details Column
 

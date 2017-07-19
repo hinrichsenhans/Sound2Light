@@ -55,10 +55,17 @@ Item {
 					// This method tries to choose the appropriate form
 					// for the OSC messages saved in the TriggerController.
 
-					// try to find a not empty OSC message:
-					var currentMessage = triggerController.getOnMessage()
-					if (!currentMessage) currentMessage = triggerController.getOffMessage()
-					if (!currentMessage) currentMessage = triggerController.getLevelMessage()
+                    // try to find a not empty OSC message:
+                    if(useRight) {
+                        var currentMessage = triggerController.getOnMessageRight()
+                        if (!currentMessage) currentMessage = triggerController.getOffMessageRight()
+                        if (!currentMessage) currentMessage = triggerController.getLevelMessageRight()
+                    }
+                    else {
+                        currentMessage = triggerController.getOnMessage()
+                        if (!currentMessage) currentMessage = triggerController.getOffMessage()
+                        if (!currentMessage) currentMessage = triggerController.getLevelMessage()
+                    }
 					currentMessage = currentMessage.toLowerCase()
 
 					// check which category fits the message:
@@ -118,7 +125,8 @@ Item {
 			}
 		}
 		Loader {
-			// This loader holds the Settings Component for the chosen message type category.
+            // This loader holds the Settings Component for the chosen message type category.
+            property alias useRight: settingsArea.useRight
 			id: settingsArea
 			width: parent.width
 			height: parent.height - 30
@@ -221,7 +229,14 @@ Item {
 				}
 			}
 
-			function restoreFromMessages() {
+            function restoreFromMessages() {
+                if(useRight)
+                    restoreFromMessagesRight();
+                else
+                    restoreFromMessagesLeft();
+            }
+
+            function restoreFromMessagesLeft() {
 				// restore values from current messages:
 				if (triggerController.getLevelMessage() !== "") {
 					channelMode.currentIndex = channelMode.model.indexOf("Level")
@@ -234,8 +249,20 @@ Item {
 				}
 			}
 
+            function restoreFromMessagesRight() {
+                // restore values from current messages:
+                if (triggerController.getLevelMessageRight() !== "") {
+                    channelMode.currentIndex = channelMode.model.indexOf("Level")
+                    channelNumber.value = Utils.lastPartAsInt(triggerController.getLevelMessageRight(), 1)
+                } else {
+                    channelMode.currentIndex = channelMode.model.indexOf("Switch")
+                    channelNumber.value = Utils.lastPartAsInt(triggerController.getOnMessageRight(), 1)
+                    channelOnValue.value = Utils.argumentAsFloat(triggerController.getOnMessageRight(), 100)
+                    channelOffValue.value = Utils.argumentAsFloat(triggerController.getOffMessageRight(), 0)
+                }
+            }
 
-			function getMessages() {
+            function getMessages() {
 				var level = channelMode.currentText === "Level";
 				var messages = {
 					"on": level ? "" : "/eos/user/<USER>/chan/" + channelNumber.value + "=" + channelOnValue.value,
@@ -326,7 +353,14 @@ Item {
 				}
 			}
 
-			function restoreFromMessages() {
+            function restoreFromMessages() {
+                if(useRight)
+                    restoreFromMessagesRight();
+                else
+                    restoreFromMessagesLeft();
+            }
+
+            function restoreFromMessagesLeft() {
 				// restore values from current messages:
 				if (triggerController.getLevelMessage() !== "") {
 					groupMode.currentIndex = groupMode.model.indexOf("Level")
@@ -339,7 +373,21 @@ Item {
 				}
 			}
 
-			function getMessages() {
+
+            function restoreFromMessagesRight() {
+                // restore values from current messages:
+                if (triggerController.getLevelMessageRight() !== "") {
+                    groupMode.currentIndex = groupMode.model.indexOf("Level")
+                    groupNumber.value = Utils.lastPartAsInt(triggerController.getLevelMessageRight(), 1)
+                } else {
+                    groupMode.currentIndex = groupMode.model.indexOf("Switch")
+                    groupNumber.value = Utils.lastPartAsInt(triggerController.getOnMessageRight(), 1)
+                    groupOnValue.value = Utils.argumentAsFloat(triggerController.getOnMessageRight(), 100)
+                    groupOffValue.value = Utils.argumentAsFloat(triggerController.getOffMessageRight(), 0)
+                }
+            }
+
+            function getMessages() {
 				var level = groupMode.currentText === "Level";
 				var messages = {
 					"on": level ? "" : "/eos/user/<USER>/group/" + groupNumber.value + "=" + groupOnValue.value,
@@ -408,7 +456,14 @@ Item {
 				}
 			}
 
-			function restoreFromMessages() {
+            function restoreFromMessages() {
+                if(useRight)
+                    restoreFromMessagesRight();
+                else
+                    restoreFromMessagesLeft();
+            }
+
+            function restoreFromMessagesLeft() {
 				// restore values from current messages:
 				if (triggerController.getOnMessage() !== "") {
 					onMacroCheckbox.checked = true
@@ -420,7 +475,18 @@ Item {
 					offMacroNumber.value = Utils.argumentAsFloat(triggerController.getOffMessage(), 1)
 				}
 			}
-
+            function restoreFromMessagesRight() {
+                // restore values from current messages:
+                if (triggerController.getOnMessage() !== "") {
+                    onMacroCheckbox.checked = true
+                    onMacroNumber.value = Utils.argumentAsFloat(triggerController.getOnMessageRight(), 1)
+                }
+                if (triggerController.getOffMessage() !== "") {
+                    offMacroCheckbox.checked = true
+                    if (triggerController.getOnMessage() === "") onMacroCheckbox.checked = false
+                    offMacroNumber.value = Utils.argumentAsFloat(triggerController.getOffMessageRight(), 1)
+                }
+            }
 			function getMessages() {
 				var messages = {
 					"on": onMacroCheckbox.checked ? "/eos/user/<USER>/macro/fire=" + onMacroNumber.value : "",
@@ -511,7 +577,14 @@ Item {
 				}
 			}
 
-			function restoreFromMessages() {
+            function restoreFromMessages() {
+                if(useRight)
+                    restoreFromMessagesRight();
+                else
+                    restoreFromMessagesLeft();
+            }
+
+            function restoreFromMessagesLeft() {
 				// restore values from current messages:
 				if (triggerController.getLevelMessage() !== "") {
 					submasterMode.currentIndex = submasterMode.model.indexOf("Level")
@@ -523,6 +596,19 @@ Item {
 					submasterOffValue.value = Utils.argumentAsFloat(triggerController.getOffMessage(), 0) * 100
 				}
 			}
+
+            function restoreFromMessagesRight() {
+                // restore values from current messages:
+                if (triggerController.getLevelMessage() !== "") {
+                    submasterMode.currentIndex = submasterMode.model.indexOf("Level")
+                    submasterNumber.value = Utils.lastPartAsInt(triggerController.getLevelMessageRight(), 1)
+                } else {
+                    submasterMode.currentIndex = submasterMode.model.indexOf("Switch")
+                    submasterNumber.value = Utils.lastPartAsInt(triggerController.getOnMessageRight(), 1)
+                    submasterOnValue.value = Utils.argumentAsFloat(triggerController.getOnMessageRight(), 100) * 100
+                    submasterOffValue.value = Utils.argumentAsFloat(triggerController.getOffMessageRight(), 0) * 100
+                }
+            }
 
 
 			function getMessages() {
@@ -565,7 +651,10 @@ Item {
 
 			function restoreFromMessages() {
 				// restore values from current messages:
-				bumpSubNumber.value = Utils.partAsInt(triggerController.getOnMessage(), 5, 1)
+                if(useRight)
+                    bumpSubNumber.value = Utils.partAsInt(triggerController.getOnMessageRight(), 5, 1)
+                else
+                    bumpSubNumber.value = Utils.partAsInt(triggerController.getOnMessage(), 5, 1)
 			}
 
 			function getMessages() {
@@ -684,7 +773,14 @@ Item {
 				}
 			}
 
-			function restoreFromMessages() {
+            function restoreFromMessages() {
+                if(useRight)
+                    restoreFromMessagesRight()
+                else
+                    restoreFromMessagesLeft()
+            }
+
+            function restoreFromMessagesLeft() {
 				// restore values from current messages:
 				if (triggerController.getOnMessage() !== "") {
                     onCueCheckbox.checked = true
@@ -698,6 +794,21 @@ Item {
 					offCueNumber.text = Utils.partAsString(triggerController.getOffMessage(), 6, "1")
 				}
 			}
+
+            function restoreFromMessagesRight() {
+                // restore values from current messages:
+                if (triggerController.getOnMessage() !== "") {
+                    onCueCheckbox.checked = true
+                    onCueList.value = Utils.partAsInt(triggerController.getOnMessageRight(), 5, 1)
+                    onCueNumber.text = Utils.partAsString(triggerController.getOnMessageRight(), 6, "1")
+                }
+                if (triggerController.getOffMessage() !== "") {
+                    offCueCheckbox.checked = true
+                    if (triggerController.getOnMessage() === "") onCueCheckbox.checked = false
+                    offCueList.value = Utils.partAsInt(triggerController.getOffMessageRight(), 5, 1)
+                    offCueNumber.text = Utils.partAsString(triggerController.getOffMessageRight(), 6, "1")
+                }
+            }
 
 			function getMessages() {
 				var onNumber = onCueNumber.text ? onCueNumber.text : "1"
@@ -804,7 +915,14 @@ Item {
 				}
 			}
 
-			function restoreFromMessages() {
+            function restoreFromMessages() {
+                if(useRight)
+                    restoreFromMessagesLeft()
+                else
+                    restoreFromMessagesRight()
+            }
+
+            function restoreFromMessagesLeft() {
 				// restore values from current messages:
 				if (triggerController.getLevelMessage() !== "") {
 					faderMode.currentIndex = faderMode.model.indexOf("Level")
@@ -819,6 +937,21 @@ Item {
 				}
 			}
 
+
+            function restoreFromMessagesRight() {
+                // restore values from current messages:
+                if (triggerController.getLevelMessage() !== "") {
+                    faderMode.currentIndex = faderMode.model.indexOf("Level")
+                    faderBank.value = Utils.partAsInt(triggerController.getLevelMessageRight(), 5, 1)
+                    faderNumber.value = Utils.lastPartAsInt(triggerController.getLevelMessageRight(), 1)
+                } else {
+                    faderMode.currentIndex = faderMode.model.indexOf("Switch")
+                    faderBank.value = Utils.partAsInt(triggerController.getOnMessageRight(), 5, 1)
+                    faderNumber.value = Utils.lastPartAsInt(triggerController.getOnMessageRight(), 1)
+                    faderOnValue.value = Utils.argumentAsFloat(triggerController.getOnMessageRight(), 100) * 100
+                    faderOffValue.value = Utils.argumentAsFloat(triggerController.getOffMessageRight(), 0) * 100
+                }
+            }
 
 			function getMessages() {
 				var level = faderMode.currentText === "Level";

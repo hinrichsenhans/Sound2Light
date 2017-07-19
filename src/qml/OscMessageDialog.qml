@@ -31,6 +31,7 @@ Dialog {
 	title: "OSC Message"
 
 	property QtObject triggerController
+    property bool useRight
 
 	// update consoleType when dialog becomes visible
 	// because it could have changed:
@@ -57,6 +58,7 @@ Dialog {
 				height: parent.height - 30
 				Component.onCompleted: updateConsoleType()
 				property alias triggerController: dialog.triggerController
+                property alias useRight: dialog.useRight
 
 				// sets the right conent for this loader based on the chosen console type
 				// - called when Component is complete and when "visible" of dialog changes
@@ -94,7 +96,7 @@ Dialog {
 					width: parent.width * 0.25
 					height: parent.height
 					text: "Test"
-					onPressedChanged: {
+                    onPressedChanged: {
 						var messages = mainArea.getMessages()
 						if (pressed) {
 							if (messages["on"]) {
@@ -131,12 +133,17 @@ Dialog {
 				DarkButton {
 					width: parent.width * 0.3
 					height: parent.height
-					text: "OK"
+                    text: "OK"
 					onClicked: {
-						var messages = mainArea.getMessages()
-						triggerController.setOscMessages(messages["on"], messages["off"], messages["level"], messages["levelMin"], messages["levelMax"], messages["shortText"])
+                        var messages = mainArea.getMessages()
+                        if(useRight) {
+                            triggerController.setOscMessagesRight(messages["on"], messages["off"], messages["level"], messages["levelMin"], messages["levelMax"], messages["shortText"])
+                        }
+                        else {
+                            triggerController.setOscMessages(messages["on"], messages["off"], messages["level"], messages["levelMin"], messages["levelMax"], messages["shortText"])
+                        }
 						dialog.close()
-						controller.dialogIsClosed(dialog)
+                        controller.dialogIsClosed(dialog)
 					}
 				}
 			}  // buttons end

@@ -697,7 +697,7 @@ void MainController::sendOscTestMessage(QString message)
 	m_osc.sendMessage(message, true);
 }
 
-void MainController::openDialog(const QString &qmlDialogFile, QString propertyName, QVariant propertyValue)
+void MainController::openDialog(const QString &qmlDialogFile, QStringList propertyName, QVariantList propertyValue)
 {
 	// check if dialog is already opened:
 	if (m_dialogs.find(qmlDialogFile) != m_dialogs.end()) {
@@ -711,9 +711,10 @@ void MainController::openDialog(const QString &qmlDialogFile, QString propertyNa
 	}
 	// create new dialog from QML file:
 	QQmlComponent* component = new QQmlComponent(m_qmlEngine, QUrl(qmlDialogFile));
-	QObject* dialog = component->beginCreate(m_qmlEngine->rootContext());
-	if (!propertyName.isEmpty()) {
-		dialog->setProperty(propertyName.toLatin1(), propertyValue);
+    QObject* dialog = component->beginCreate(m_qmlEngine->rootContext());
+
+    for(int i = 0; i < propertyName.count() && i < propertyValue.count(); ++i) {
+        dialog->setProperty(propertyName.at(i).toLatin1(), propertyValue.at(i));
 	}
 	component->completeCreate();
 	QMetaObject::invokeMethod(dialog, "open");
