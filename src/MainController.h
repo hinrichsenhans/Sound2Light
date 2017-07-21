@@ -283,13 +283,13 @@ public slots:
 	// forward calls to ScaledSpectrum of FFTAnalyzer
 	// see ScaledSpectrum.h for documentation
 	qreal getFftGain() const { return m_fft.getScaledSpectrum().getGain(); }
-	void setFftGain(const qreal& value) { m_fft.getScaledSpectrum().setGain(value); emit gainChanged(); emit presetChanged(); }
+    void setFftGain(const qreal& value) { m_fft.getScaledSpectrum().setGain(value); m_fft_right.getScaledSpectrum().setGain(value); emit gainChanged(); emit presetChanged(); }
 	qreal getFftCompression() const { return m_fft.getScaledSpectrum().getCompression(); }
-	void setFftCompression(const qreal& value) { m_fft.getScaledSpectrum().setCompression(value); emit compressionChanged(); emit presetChanged(); }
+    void setFftCompression(const qreal& value) { m_fft.getScaledSpectrum().setCompression(value); m_fft_right.getScaledSpectrum().setCompression(value); emit compressionChanged(); emit presetChanged(); }
 	bool getDecibelConversion() const { return m_fft.getScaledSpectrum().getDecibelConversion(); }
-	void setDecibelConversion(bool value) { m_fft.getScaledSpectrum().setDecibelConversion(value); emit decibelConversionChanged(); emit presetChanged(); }
+    void setDecibelConversion(bool value) { m_fft.getScaledSpectrum().setDecibelConversion(value); m_fft_right.getScaledSpectrum().setDecibelConversion(value); emit decibelConversionChanged(); emit presetChanged(); }
 	bool getAgcEnabled() const { return m_fft.getScaledSpectrum().getAgcEnabled(); }
-	void setAgcEnabled(bool value) { m_fft.getScaledSpectrum().setAgcEnabled(value); emit agcEnabledChanged(); emit presetChanged(); }
+    void setAgcEnabled(bool value) { m_fft.getScaledSpectrum().setAgcEnabled(value); m_fft_right.getScaledSpectrum().setAgcEnabled(value); emit agcEnabledChanged(); emit presetChanged(); }
 
 	// forward calls to OSCNetworkManager
 	// see OSCNetworkManager.h for documentation
