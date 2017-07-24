@@ -91,7 +91,7 @@ ApplicationWindow {
 		TriggerSettingsArea {
 			id: triggerSettingsArea
             visible: minimalMode ? false : true
-            Layout.minimumHeight: minimalMode ? 0 : detailsVisible ? 390 : 280
+            Layout.minimumHeight: minimalMode ? 0 : detailsVisible ? 430 : 280
             height: minimalMode ? 0 : 400
 		}
 

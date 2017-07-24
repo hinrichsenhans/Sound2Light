@@ -42,7 +42,7 @@ Dialog {
 
 	contentItem: Item {
 		implicitWidth: 270
-		implicitHeight: 400
+        implicitHeight: 400
 
 		DarkBlueStripedBackground {}
 
@@ -250,7 +250,7 @@ Dialog {
             ExclusiveGroup { id: inputListGroup }
 			ScrollView {
 				width: parent.width
-				height: parent.height - 40*2 - 30*5 - 20 - (udpTxPort.visible ? 30 : 0)
+                height: parent.height - 40*2 - 30*6 - 20 - (udpTxPort.visible ? 30 : 0)
 				ListView {
 					id: inputList
 					model: controller.getAvailableInputs()
