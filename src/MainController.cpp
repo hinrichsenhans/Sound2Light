@@ -40,10 +40,10 @@ MainController::MainController(QQmlApplicationEngine* qmlEngine, QObject *parent
 	: QObject(parent)
 	, m_qmlEngine(qmlEngine)
     , m_buffer(NUM_SAMPLES*4) // more buffer so the bpm detector can get overlaping data
-	, m_audioInput(0)
+    , m_audioInput(nullptr)
 	, m_fft(m_buffer, m_triggerContainer)
 	, m_osc()
-	, m_consoleType("EOS")
+	, m_consoleType("Eos")
 	, m_oscMapping(this)
     , m_lowSoloMode(false)
     , m_bpmOSC(m_osc)
@@ -51,6 +51,7 @@ MainController::MainController(QQmlApplicationEngine* qmlEngine, QObject *parent
     , m_bpmTap(&m_bpmOSC)
     , m_bpmActive(false)
     , m_waveformVisible(true)
+    , m_autoBpm(false)
 {
 	m_audioInput = new QAudioInputWrapper(&m_buffer);
 
@@ -61,21 +62,21 @@ MainController::MainController(QQmlApplicationEngine* qmlEngine, QObject *parent
 MainController::~MainController()
 {
 	// delete all objects created on Heap:
-	delete m_audioInput; m_audioInput = 0;
+    delete m_audioInput; m_audioInput = nullptr;
 
-	delete m_bass; m_bass = 0;
-	delete m_loMid; m_loMid = 0;
-	delete m_hiMid; m_hiMid = 0;
-	delete m_high; m_high = 0;
-	delete m_envelope; m_envelope = 0;
-	delete m_silence; m_silence = 0;
+    delete m_bass; m_bass = nullptr;
+    delete m_loMid; m_loMid = nullptr;
+    delete m_hiMid; m_hiMid = nullptr;
+    delete m_high; m_high = nullptr;
+    delete m_envelope; m_envelope = nullptr;
+    delete m_silence; m_silence = nullptr;
 
-	delete m_bassController; m_bassController = 0;
-	delete m_loMidController; m_loMidController = 0;
-	delete m_hiMidController; m_hiMidController = 0;
-	delete m_highController; m_highController = 0;
-	delete m_envelopeController; m_envelopeController = 0;
-	delete m_silenceController; m_silenceController = 0;
+    delete m_bassController; m_bassController = nullptr;
+    delete m_loMidController; m_loMidController = nullptr;
+    delete m_hiMidController; m_hiMidController = nullptr;
+    delete m_highController; m_highController = nullptr;
+    delete m_envelopeController; m_envelopeController = nullptr;
+    delete m_silenceController; m_silenceController = nullptr;
 }
 
 void MainController::initBeforeQmlIsLoaded()
@@ -223,17 +224,13 @@ void MainController::initAudioInput()
 
 void MainController::triggerBeat()
 {
-    if (m_bpmActive) {
-        setBPMActive(false);
-    }
+    setAutoBpm(false);
     m_bpmTap.triggerBeat();
 }
 
 void MainController::setBPM(float value)
 {
-    if (m_bpmActive) {
-        setBPMActive(false);
-    }
+    setAutoBpm(false);
     m_bpmTap.setBpm(value);
 }
 
@@ -310,6 +307,7 @@ void MainController::setOscEnabled(bool value) {
 
 // enable or disables bpm detection
 void MainController::setBPMActive(bool value) {
+    if (value == m_bpmActive) return;
     m_bpmActive = value;
     if (m_bpmActive) {
         activateBPM();
@@ -321,6 +319,19 @@ void MainController::setBPMActive(bool value) {
     m_osc.sendMessage("/s2l/out/bpm/enabled", (value ? "1" : "0"), true);
 }
 
+void MainController::setAutoBpm(bool value) {
+    if (value == m_autoBpm) return;
+    m_autoBpm = value;
+    qDebug() << m_autoBpm;
+    m_bpm.setTransmitBpm(m_autoBpm);
+    if (m_autoBpm && !m_bpmActive) {
+        setBPMActive(true);
+    } else if (!m_autoBpm && !m_waveformVisible && m_bpmActive) {
+        setBPMActive(false);
+    }
+    emit autoBpmChanged();
+}
+
 // sets the minium bpm of the range
 void MainController::setMinBPM(int value) {
     m_bpm.setMinBPM(value);
@@ -329,10 +340,20 @@ void MainController::setMinBPM(int value) {
     m_osc.sendMessage("/s2l/out/bpm/range", QString::number(value), true);
 }
 
+void MainController::setWaveformVisible(bool value) {
+    m_waveformVisible = value;
+    if (m_waveformVisible && !m_bpmActive) {
+        setBPMActive(true);
+    } else if (!m_autoBpm && !m_waveformVisible && m_bpmActive) {
+        setBPMActive(false);
+    }
+    emit waveformVisibleChanged();
+}
+
 void MainController::onExit()
 {
-	savePresetIndependentSettings();
-	autosave();
+    savePresetIndependentSettings();
+    autosave();
 }
 
 void MainController::onVisibilityChanged()
@@ -372,7 +393,13 @@ void MainController::savePresetIndependentSettings() const
 	independentSettings.setValue("oscIsEnabled", getOscEnabled());
 	independentSettings.setValue("oscUseTcp", getUseTcp());
 	independentSettings.setValue("oscUse_1_1", getUseOsc_1_1());
-	independentSettings.setValue("windowGeometry", getMainWindow()->geometry());
+    QRect windowGeometry = getMainWindow()->geometry();
+    if (windowGeometry.width() < 300) {
+        // -> minimal mode, save default geometry
+        windowGeometry.setWidth(1200);
+        windowGeometry.setHeight(800);
+    }
+    independentSettings.setValue("windowGeometry", windowGeometry);
 	bool maximized = (getMainWindow()->width() == QGuiApplication::primaryScreen()->availableSize().width());
 	independentSettings.setValue("maximized", maximized);
 	independentSettings.setValue("inputDeviceName", getActiveInputName());
@@ -458,6 +485,7 @@ void MainController::loadPreset(const QString &constFileName, bool createIfNotEx
 	setConsoleType(settings.value("consoleType").toString());
     setLowSoloMode(settings.value("lowSoloMode").toBool());
     setBPMActive(settings.value("bpm/Active", false).toBool());
+    setAutoBpm(settings.value("autoBpm", false).toBool());
     setWaveformVisible(settings.value("waveformVisible", true).toBool());
 
 	// restore the settings in all TriggerGenerators:
@@ -544,6 +572,7 @@ void MainController::savePresetAs(const QString &constFileName, bool isAutosave)
 	settings.setValue("consoleType", getConsoleType());
     settings.setValue("lowSoloMode", getLowSoloMode());
     settings.setValue("bpm/Active", getBPMActive());
+    settings.setValue("autoBpm", getAutoBpm());
     settings.setValue("waveformVisible", m_waveformVisible); // store property because getter is for GUI, and only returns true if bpm is active
 
 	// save the settings in all TriggerGenerators:

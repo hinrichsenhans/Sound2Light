@@ -29,28 +29,11 @@
 #include <QSplashScreen>
 
 
-int main(int argc, char *argv[])
-{
-	// set GUI scaling factor for high DPI displays:
-	// create dummy QApplication to access logicalDotsPerInch():
-	QApplication* unusedApp = new QApplication(argc, argv);
-	qunsetenv("QT_DEVICE_PIXEL_RATIO");
-	qputenv("QT_AUTO_SCREEN_SCALE_FACTOR", "0");
-	qreal standardDpi = 96;
-#ifdef Q_OS_MAC
-	standardDpi = 72;
-#endif
-	qreal scaleFactor = QApplication::primaryScreen()->logicalDotsPerInch() / standardDpi;
-	scaleFactor = qMax(1.0, scaleFactor);
-	qputenv("QT_SCREEN_SCALE_FACTORS", QString::number(scaleFactor, 'g', 2).toUtf8());
-	qDebug() << "Screen Scale Factor: " << scaleFactor;
-	// destroy dummy app because scale factor will only take effect with new app:
-	delete unusedApp;
-    unusedApp = 0;
-
-	QApplication app(argc, argv);
-	// set app icon:
+int main(int argc, char *argv[]) {
+    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    QApplication app(argc, argv);
 	app.setWindowIcon(QIcon(":/images/icons/etcicon.ico"));
+
 	// these parameters are used by QSettings:
 	QCoreApplication::setOrganizationName("ETC");
 	QCoreApplication::setApplicationName("Sound2Light");
@@ -68,19 +51,19 @@ int main(int argc, char *argv[])
 
 	// create QmlEngine and MainController:
 	QQmlApplicationEngine engine;
-	MainController controller(&engine);
+    MainController* controller = new MainController(&engine);
 
 	// set global QML variable "controller" to a pointer to the MainController:
-	engine.rootContext()->setContextProperty("controller", &controller);
+    engine.rootContext()->setContextProperty("controller", controller);
+
 	// quit QGuiApplication when quit signal is emitted:
 	QObject::connect(&engine, SIGNAL(quit()), &app, SLOT(quit()));
 	// call onExit() method of controller when app is about to quit:
-	QObject::connect(&app, SIGNAL(aboutToQuit()), &controller, SLOT(onExit()));
+    QObject::connect(&app, SIGNAL(aboutToQuit()), controller, SLOT(onExit()));
 
-	controller.initBeforeQmlIsLoaded();
-	// actually load QML file:
+    controller->initBeforeQmlIsLoaded();
 	engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));
-	controller.initAfterQmlIsLoaded();
+    controller->initAfterQmlIsLoaded();
 
 	// ---------- Hide Splash Screen ---------
 	splash.hide();
